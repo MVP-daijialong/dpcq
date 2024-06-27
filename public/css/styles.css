@@ -1,0 +1,36 @@
+body {
+    padding: 20px;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.room-description {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
+.room-actions {
+    margin-top: 10px;
+    .see-list>a {
+        margin-right: 10px;
+    }
+}
+.o-bt {
+    color: #01AAED;
+}
+
+.room-actions .s-attack {
+    color: #2F4056;
+}
+
+.room-actions .s-damage {
+    color: #FF5722;
+}
+
+.s-heal {
+    color: #5FB878;
+}
+
+
