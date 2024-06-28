@@ -75,6 +75,7 @@ class Chat implements MessageComponentInterface
 
         $role_id = $data['role_id'];
         $server_id = $data['server_id'];
+        $map_id = $data['map_id'];
         $role_name = $data['role_name'];
         $chat_channel = $data['chat_channel'];
         $content = $data['message'];
@@ -82,8 +83,8 @@ class Chat implements MessageComponentInterface
 
         // Save the message to the database
         try {
-            $stmt = $this->pdo->prepare("INSERT INTO dp_chats (server_id, role_id, role_name, chat_channel, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$server_id, $role_id, $role_name, $chat_channel, $content, $time, $time]);
+            $stmt = $this->pdo->prepare("INSERT INTO dp_chats (server_id, map_id, role_id, role_name, chat_channel, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$server_id, $map_id, $role_id, $role_name, $chat_channel, $content, $time, $time]);
         } catch (\PDOException $e) {
             $this->logger->error('Database error: ' . $e->getMessage());
 
@@ -91,8 +92,8 @@ class Chat implements MessageComponentInterface
             $this->reconnectDatabase();
 
             try {
-                $stmt = $this->pdo->prepare("INSERT INTO dp_chats (server_id, role_id, role_name, chat_channel, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$server_id, $role_id, $role_name, $chat_channel, $content, $time, $time]);
+                $stmt = $this->pdo->prepare("INSERT INTO dp_chats (server_id, map_id, role_id, role_name, chat_channel, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$server_id, $map_id, $role_id, $role_name, $chat_channel, $content, $time, $time]);
             } catch (\PDOException $e) {
                 $this->logger->error('Database reconnection error: ' . $e->getMessage());
             }
@@ -100,7 +101,12 @@ class Chat implements MessageComponentInterface
 
         // Broadcast the message to all connected clients
         foreach ($this->connections as $conn) {
-            $conn->send($role_name . ": " . $content);
+            $conn->send(json_encode([
+                'role_name' => $role_name,
+                'chat_channel' => $chat_channel,
+                'map_id' => $map_id,
+                'message' => "[" . $time . "] " . $role_name . ": " . $content
+            ]));
         }
     }
 }
